@@ -1,78 +1,114 @@
-import React, { useState } from "react";
-import "./App.css";
+import React, { useState, useEffect } from "react";
 
-const Calculator = () => {
-  const [input, setInput] = useState("0");
-  const [formula, setFormula] = useState("");
+const App = () => {
+  // State management
+  const [breakLength, setBreakLength] = useState(5);
+  const [sessionLength, setSessionLength] = useState(25);
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isSession, setIsSession] = useState(true);
+  const [intervalId, setIntervalId] = useState(null);
 
-  const operators = ["+", "-", "*", "/"];
+  // Format time for display
+  const formatTime = (time) => {
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
 
-  const handleClick = (value) => {
-    if (value === "clear") {
-      setInput("0");
-      setFormula("");
-      return;
-    }
-
-    if (value === "=") {
-      try {
-        const result = eval(formula);
-        setInput(result.toString());
-        setFormula(result.toString());
-      } catch {
-        setInput("Error");
-        setFormula("");
-      }
-      return;
-    }
-
-    if (operators.includes(value)) {
-      if (operators.includes(formula.slice(-1))) {
-        setFormula((prev) => prev.slice(0, -1) + value);
-      } else {
-        setFormula((prev) => prev + value);
-      }
-      setInput(value);
-      return;
-    }
-
-    if (value === ".") {
-      if (input.includes(".")) return;
-    }
-
-    if (input === "0" && value !== ".") {
-      setInput(value);
-      setFormula(value);
-    } else {
-      setInput((prev) => prev + value);
-      setFormula((prev) => prev + value);
+  // Handle increment and decrement of break/session
+  const handleBreakChange = (change) => {
+    if (!isRunning) {
+      setBreakLength((prev) => Math.min(60, Math.max(1, prev + change)));
     }
   };
 
+  const handleSessionChange = (change) => {
+    if (!isRunning) {
+      let newSession = Math.min(60, Math.max(1, sessionLength + change));
+      setSessionLength(newSession);
+      setTimeLeft(newSession * 60);
+    }
+  };
+
+  // Handle start/stop functionality
+  const toggleTimer = () => {
+    if (isRunning) {
+      clearInterval(intervalId);
+      setIsRunning(false);
+    } else {
+      const id = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+      setIntervalId(id);
+      setIsRunning(true);
+    }
+  };
+
+  // Handle timer logic
+  useEffect(() => {
+    if (timeLeft < 0) {
+      document.getElementById("beep").play();
+      setTimeout(() => {
+        document.getElementById("beep").pause();
+        document.getElementById("beep").currentTime = 0;
+      }, 1000);
+      
+      if (isSession) {
+        setTimeLeft(breakLength * 60);
+      } else {
+        setTimeLeft(sessionLength * 60);
+      }
+      setIsSession(!isSession);
+    }
+  }, [timeLeft, isSession, breakLength, sessionLength]);
+
+  // Handle reset functionality
+  const resetTimer = () => {
+    clearInterval(intervalId);
+    setIsRunning(false);
+    setBreakLength(5);
+    setSessionLength(25);
+    setTimeLeft(25 * 60);
+    setIsSession(true);
+    const beep = document.getElementById("beep");
+    beep.pause();
+    beep.currentTime = 0;
+  };
+
   return (
-    <div className="calculator">
-      <div id="display">{input}</div>
-      <div className="buttons">
-        <button id="clear" onClick={() => handleClick("clear")}>AC</button>
-        <button id="divide" onClick={() => handleClick("/")}>/</button>
-        <button id="multiply" onClick={() => handleClick("")}></button>
-        <button id="seven" onClick={() => handleClick("7")}>7</button>
-        <button id="eight" onClick={() => handleClick("8")}>8</button>
-        <button id="nine" onClick={() => handleClick("9")}>9</button>
-        <button id="subtract" onClick={() => handleClick("-")}>-</button>
-        <button id="four" onClick={() => handleClick("4")}>4</button>
-        <button id="five" onClick={() => handleClick("5")}>5</button>
-        <button id="six" onClick={() => handleClick("6")}>6</button>
-        <button id="add" onClick={() => handleClick("+")}>+</button>
-        <button id="one" onClick={() => handleClick("1")}>1</button>
-        <button id="two" onClick={() => handleClick("2")}>2</button>
-        <button id="three" onClick={() => handleClick("3")}>3</button>
-        <button id="zero" onClick={() => handleClick("0")}>0</button>
-        <button id="decimal" onClick={() => handleClick(".")}>.</button>
-        <button id="equals" onClick={() => handleClick("=")}>=</button>
+    <div className="container text-center mt-5">
+      <h1>25 + 5 Clock</h1>
+
+      <div className="row">
+        <div className="col">
+          <h3 id="break-label">Break Length</h3>
+          <button id="break-decrement" onClick={() => handleBreakChange(-1)}>−</button>
+          <span id="break-length">{breakLength}</span>
+          <button id="break-increment" onClick={() => handleBreakChange(1)}>+</button>
+        </div>
+
+        <div className="col">
+          <h3 id="session-label">Session Length</h3>
+          <button id="session-decrement" onClick={() => handleSessionChange(-1)}>−</button>
+          <span id="session-length">{sessionLength}</span>
+          <button id="session-increment" onClick={() => handleSessionChange(1)}>+</button>
+        </div>
       </div>
+
+      <div id="timer">
+        <h2 id="timer-label">{isSession ? "Session" : "Break"}</h2>
+        <h1 id="time-left">{formatTime(timeLeft)}</h1>
+      </div>
+
+      <button id="start_stop" onClick={toggleTimer}>
+        {isRunning ? "Pause" : "Start"}
+      </button>
+      <button id="reset" onClick={resetTimer}>Reset</button>
+
+      <audio id="beep" src="https://www.soundjay.com/button/beep-07.wav"></audio>
     </div>
   );
 };
 
-export default Calculator;
+export default App;

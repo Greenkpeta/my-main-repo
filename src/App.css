@@ -1,46 +1,76 @@
-.calculator {
-  width: 250px;
-  margin: 50px auto;
-  background: #333;
+/* General Styles */
+body {
+  background-color: #282c34;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+/* Timer Display */
+#timer {
+  background-color: #1c1f26;
   padding: 20px;
   border-radius: 10px;
-  text-align: center;
+  display: inline-block;
+  margin: 20px 0;
 }
 
-#display {
-  background: #000;
-  color: white;
-  padding: 15px;
-  font-size: 1.5em;
-  text-align: right;
-  margin-bottom: 10px;
+#time-left {
+  font-size: 3rem;
+  font-weight: bold;
 }
 
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-}
-
+/* Controls */
 button {
-  padding: 20px;
-  font-size: 1.2em;
+  background-color: #61dafb;
   border: none;
-  background: #666;
-  color: white;
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 1.5rem;
+  border-radius: 5px;
   cursor: pointer;
+  transition: 0.3s;
 }
 
 button:hover {
-  background: #888;
+  background-color: #4fa3d1;
 }
 
-#clear {
-  grid-column: span 2;
-  background: red;
+/* Length Controls */
+.col {
+  display: inline-block;
+  margin: 20px;
+  padding: 10px;
+  background-color: #333;
+  border-radius: 10px;
 }
 
-#equals {
-  grid-column: span 2;
-  background: green;
+#break-length,
+#session-length {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0 10px;
+}
+
+/* Reset & Start/Stop Buttons */
+#reset {
+  background-color: red;
+}
+
+#reset:hover {
+  background-color: darkred;
+}
+
+#start_stop {
+  background-color: green;
+}
+
+#start_stop:hover {
+  background-color: darkgreen;
 }
