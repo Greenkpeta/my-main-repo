@@ -1,63 +1,78 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./App.css";
 
-// Audio clips
-const drumPads = [
-  { key: "Q", name: "Heater 1", src: "https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3" },
-  { key: "W", name: "Heater 2", src: "https://s3.amazonaws.com/freecodecamp/drums/Heater-2.mp3" },
-  { key: "E", name: "Heater 3", src: "https://s3.amazonaws.com/freecodecamp/drums/Heater-3.mp3" },
-  { key: "A", name: "Heater 4", src: "https://s3.amazonaws.com/freecodecamp/drums/Heater-4_1.mp3" },
-  { key: "S", name: "Clap", src: "https://s3.amazonaws.com/freecodecamp/drums/Clap.mp3" },
-  { key: "D", name: "Open-HH", src: "https://s3.amazonaws.com/freecodecamp/drums/Open-HH.mp3" },
-  { key: "Z", name: "Kick-n'-Hat", src: "https://s3.amazonaws.com/freecodecamp/drums/Kick_n_Hat.mp3" },
-  { key: "X", name: "Kick", src: "https://s3.amazonaws.com/freecodecamp/drums/Kick.mp3" },
-  { key: "C", name: "Closed-HH", src: "https://s3.amazonaws.com/freecodecamp/drums/Closed-HH.mp3" },
-];
+const Calculator = () => {
+  const [input, setInput] = useState("0");
+  const [formula, setFormula] = useState("");
 
-function DrumMachine() {
-  const [displayText, setDisplayText] = useState("");
+  const operators = ["+", "-", "*", "/"];
 
-  // Handle key presses
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-      const pad = drumPads.find((p) => p.key === event.key.toUpperCase());
-      if (pad) {
-        playSound(pad.key, pad.name);
+  const handleClick = (value) => {
+    if (value === "clear") {
+      setInput("0");
+      setFormula("");
+      return;
+    }
+
+    if (value === "=") {
+      try {
+        const result = eval(formula);
+        setInput(result.toString());
+        setFormula(result.toString());
+      } catch {
+        setInput("Error");
+        setFormula("");
       }
-    };
+      return;
+    }
 
-    document.addEventListener("keydown", handleKeyPress);
-    return () => document.removeEventListener("keydown", handleKeyPress);
-  }, []);
+    if (operators.includes(value)) {
+      if (operators.includes(formula.slice(-1))) {
+        setFormula((prev) => prev.slice(0, -1) + value);
+      } else {
+        setFormula((prev) => prev + value);
+      }
+      setInput(value);
+      return;
+    }
 
-  const playSound = (key, name) => {
-    const audio = document.getElementById(key);
-    if (audio) {
-      audio.currentTime = 0;
-      audio.play();
-      setDisplayText(name);
+    if (value === ".") {
+      if (input.includes(".")) return;
+    }
+
+    if (input === "0" && value !== ".") {
+      setInput(value);
+      setFormula(value);
+    } else {
+      setInput((prev) => prev + value);
+      setFormula((prev) => prev + value);
     }
   };
 
   return (
-    <div id="drum-machine">
-      <h1>Drum Machine</h1>
-      <div id="display">{displayText || "Press a key"}</div>
-      <div className="drum-pad-container">
-        {drumPads.map((pad) => (
-          <button
-            key={pad.key}
-            className="drum-pad"
-            id={pad.name}
-            onClick={() => playSound(pad.key, pad.name)}
-          >
-            {pad.key}
-            <audio className="clip" id={pad.key} src={pad.src}></audio>
-          </button>
-        ))}
+    <div className="calculator">
+      <div id="display">{input}</div>
+      <div className="buttons">
+        <button id="clear" onClick={() => handleClick("clear")}>AC</button>
+        <button id="divide" onClick={() => handleClick("/")}>/</button>
+        <button id="multiply" onClick={() => handleClick("")}></button>
+        <button id="seven" onClick={() => handleClick("7")}>7</button>
+        <button id="eight" onClick={() => handleClick("8")}>8</button>
+        <button id="nine" onClick={() => handleClick("9")}>9</button>
+        <button id="subtract" onClick={() => handleClick("-")}>-</button>
+        <button id="four" onClick={() => handleClick("4")}>4</button>
+        <button id="five" onClick={() => handleClick("5")}>5</button>
+        <button id="six" onClick={() => handleClick("6")}>6</button>
+        <button id="add" onClick={() => handleClick("+")}>+</button>
+        <button id="one" onClick={() => handleClick("1")}>1</button>
+        <button id="two" onClick={() => handleClick("2")}>2</button>
+        <button id="three" onClick={() => handleClick("3")}>3</button>
+        <button id="zero" onClick={() => handleClick("0")}>0</button>
+        <button id="decimal" onClick={() => handleClick(".")}>.</button>
+        <button id="equals" onClick={() => handleClick("=")}>=</button>
       </div>
     </div>
   );
-}
+};
 
-export default DrumMachine;
+export default Calculator;
