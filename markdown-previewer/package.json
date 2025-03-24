@@ -1,5 +1,5 @@
 {
-  "name": "my-react-app",
+  "name": "markdown-previewer",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "dompurify": "^3.2.4",
-    "marked": "^15.0.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
